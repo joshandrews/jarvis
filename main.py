@@ -1,7 +1,8 @@
 import urllib
 import urllib2
- 
- 
+import pyaudio
+import wave
+
 Recording = 'recording.flac'
  
  
