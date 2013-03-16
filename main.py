@@ -7,9 +7,10 @@ import json
 import os
 import thread
 import time
+import datetime
 
 all_words = []
-jarvis = ["jarvis", "jervis", "service", "jars", "chargers", "Purvis", "nervous", "tervis", "German", "earth", "rs", "things", "ervice", "drivers", "artist" "gorgeous", "first", "davis", "just", "don't", "harvest"]
+jarvis = ["jarvis", "jervis", "service", "jars", "chargers", "purvis", "burgers", "nervous", "tervis", "German", "earth", "rs", "things", "ervice", "drivers", "artist" "gorgeous", "first", "davis", "just", "don't", "harvest"]
 stop = ["stop", "stopped", "suck", "sucks", "top", "test", "stock"]
 run = True
 
@@ -50,8 +51,13 @@ def getfromgoogle(Recording):
 	os.remove(Recording)
 	parsejson(data)
 
+
+
 def analyze(i):
-	while (len(all_words) > i):
+	while (len(all_words) > i or run):
+		dobj = datetime.datetime.now()
+		while (len(all_words) == i):
+			time.sleep(.5)
 		if (all_words[i] == "####"):
 			os.system("Watch your language")
 		if (all_words[i] == "what"):
@@ -61,7 +67,7 @@ def analyze(i):
 
 			else:
 				i-=1
-				time.sleep(3)
+				time.sleep(1)
 				
 		if (all_words[i] == "hello"):
 			if (len(all_words) > i+1):
@@ -70,8 +76,9 @@ def analyze(i):
 
 			else:
 				i-=1
-				time.sleep(3)
-				
+				time.sleep(1)
+		
+		# Fix this, it is a complete gong show.. I mean really -- josh...
 		if (all_words[i].lower() in jarvis):
 			print all_words[i]
 			if (len(all_words) > i+1):
@@ -80,14 +87,30 @@ def analyze(i):
 					sys.exit()
 				if (all_words[i+1] == 'dance'):
 					os.system('say jarvis is dancing up a storm')
+				if (all_words[i+1] == 'what'):
+					if (len(all_words) > i+2):
+						if (all_words[i+2] == 'time'):
+							if (len(all_words) > i+3):
+								if (all_words[i+3] == 'is'):
+									if (len(all_words) > i+4):
+										if (all_words[i+4] == 'it'):
+											os.system('say it is'+str(dobj.hour)+" "+str(dobj.minute))
+									else:
+										i-=1
+										time.sleep(1)
+							else:
+								i-=1
+								time.sleep(1)
+					else:
+						i-=1
+						time.sleep(1)
 
 			else:
 				i-=1
-				time.sleep(3)
+				time.sleep(1)
 		i+=1
-		
-	time.sleep(.5)
-	analyze(i)
+		while (len(all_words) == i):
+			time.sleep(.2)
 
 if __name__ == '__main__':
 	thread.start_new_thread(start, ())

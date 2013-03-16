@@ -71,7 +71,7 @@ def record():
 	datalist = []
 	movavglist = []
 	send = 0
-	pastdata = collections.deque(maxlen=30)
+	pastdata = collections.deque(maxlen=50)
 	while True:
 		data = stream.read(CHUNK)
 		asInts = array('h', data)
@@ -93,6 +93,9 @@ def record():
 			break;
 		elif (reco < .2 and send > 200):
 			break;
+		elif (send > 1):
+			frames.append(data)	
+			
 		pastdata.append(data)
 		
 			
