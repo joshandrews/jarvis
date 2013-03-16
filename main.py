@@ -9,7 +9,7 @@ import thread
 import time
 
 all_words = []
-jarvis = ["jarvis", "jervis", "service", "jars", "chargers", "tervis", "German", "earth", "rs", "things", "drivers", "artist" "gorgeous", "first", "davis", "just", "don't", "harvest"]
+jarvis = ["jarvis", "jervis", "service", "jars", "chargers", "Purvis", "nervous", "tervis", "German", "earth", "rs", "things", "ervice", "drivers", "artist" "gorgeous", "first", "davis", "just", "don't", "harvest"]
 stop = ["stop", "stopped", "suck", "sucks", "top", "test", "stock"]
 run = True
 
@@ -53,7 +53,7 @@ def getfromgoogle(Recording):
 def analyze(i):
 	while (len(all_words) > i):
 		if (all_words[i] == "####"):
-			os.system("say what did you just say to me bitch?")
+			os.system("Watch your language")
 		if (all_words[i] == "what"):
 			if (len(all_words) > i+1):
 				if (all_words[i+1].lower() == "what"):

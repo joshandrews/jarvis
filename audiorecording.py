@@ -5,6 +5,7 @@ import sys
 import time
 import subprocess, shlex
 from array import array
+import collections
 
 def moving_average(data, sample_size):
     if (len(data) > 200):
@@ -70,6 +71,7 @@ def record():
 	datalist = []
 	movavglist = []
 	send = 0
+	pastdata = collections.deque(maxlen=30)
 	while True:
 		data = stream.read(CHUNK)
 		asInts = array('h', data)
@@ -82,11 +84,16 @@ def record():
 			movavglist.append(0.0)
 		reco = moving_average(movavglist, 10)
 		if (reco > 0.1):
+			if (send == 0):
+				frames.extend(list(pastdata))
 			send += 1;
 			#print "speaking"
 			frames.append(data)	
 		elif send > 12:
 			break;
+		elif (reco < .2 and send > 200):
+			break;
+		pastdata.append(data)
 		
 			
 	
