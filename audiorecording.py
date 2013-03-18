@@ -71,9 +71,12 @@ def record():
 	datalist = []
 	movavglist = []
 	send = 0
-	pastdata = collections.deque(maxlen=50)
+	pastdata = collections.deque(maxlen=30)
 	while True:
-		data = stream.read(CHUNK)
+		try:
+			data = stream.read(CHUNK)
+		except Exception:
+			pass
 		asInts = array('h', data)
 		average = sum(asInts)/float(len(asInts))
 		datalist.append(average)
@@ -83,16 +86,18 @@ def record():
 		else:
 			movavglist.append(0.0)
 		reco = moving_average(movavglist, 10)
-		if (reco > 0.1):
+		if (reco > 0.3):
 			if (send == 0):
 				frames.extend(list(pastdata))
 			send += 1;
 			#print "speaking"
 			frames.append(data)	
-		elif send > 12:
-			break;
+			if (send > 500):
+				break
+		elif send > 8:
+			break
 		elif (reco < .2 and send > 200):
-			break;
+			break
 		elif (send > 1):
 			frames.append(data)	
 			
