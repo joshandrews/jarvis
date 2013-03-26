@@ -9,9 +9,10 @@ import thread
 import time
 import datetime
 from xml.etree import ElementTree
+import re
 
 all_words = []
-jarvis = ["jarvis", "jervis", "jersey", "germans", "thomas", "travis", "garvis" "starbucks", "service", "jars", "charlotte", "chargers", "harris", "purvis", "burgers", "nervous", "tervis", "german", "earth","office", "rs", "things", "ervice", "drivers", "artist" "gorgeous", "first", "davis", "just", "don't", "harvest", "jerk"]
+jarvis = ["jarvis", "jervis", "jersey", "germans", "dervis", "thomas", "travis", "garvis" "starbucks", "service", "jars", "charlotte", "chargers", "harris", "purvis", "burgers", "nervous", "tervis", "german", "earth","office", "rs", "things", "ervice", "drivers", "artist" "gorgeous", "first", "davis", "just", "don't", "harvest", "jerk"]
 stop = ["stop", "stopped", "suck", "sucks", "top", "test", "stock"]
 dance = ["dance", "damn", "dan"]
 facebook = ["facebook.com", "facebook"]
@@ -19,7 +20,13 @@ pause = ["pause", "pos", "are", "pod", "hot"]
 current = ["current", "temperature"]
 temperature = ["temperature", "outside"]
 high = ["hi", "high"]
+clothing = ["everything. Just wear everything.", "jeans, with a tuuk, and gloves, and a fleece, and a sweater, and a winter coat, and whatever else you need.  It is super cold out, man", "jeans with a t-shirt and your fleece and a winter coat.  Perhaps the one from John Lewis.  It is rather cold out.", "jeans with a t-shirt and your smartwool or fleece.  It is kind of cold.", "jeans with a t-shirt and your smartwool.  It is balmy out.", "shorts and a t-shirt and your smartwool. It is warm out!", "shorts and a t-shirt.  It is hot out!"]
+temps = [-40, -15, -5, 5, 10, 20, 35]
+print len(clothing)
+print len(temps)
 run = True
+wesbrook = ["westbrook", "wesbrook", "west"]
+microphone = audiorecording.microphone()
 
 def parsegooglejson(obj):
 	jsonresponse = json.load(obj)
@@ -42,10 +49,11 @@ def parsegooglejson(obj):
     
 def start():
 	while(run):
-		Recording = audiorecording.dorecord()
-		thread.start_new_thread(getfromgoogle, (Recording, ))
+		WAV_RECORDING = microphone.record()
+		thread.start_new_thread(getfromgoogle, (WAV_RECORDING, ))
 		
-def getfromgoogle(Recording):
+def getfromgoogle(WAV_RECORDING):
+	Recording =  microphone.wavtoflac(WAV_RECORDING)
 	url = "https://www.google.com/speech-api/v1/recognize?client=chromium&lang=en-us"
 	flac=open(Recording,"rb").read()
 	header = {'Content-Type' : 'audio/x-flac; rate=44100'}
@@ -67,8 +75,8 @@ def parsetranslinkjson(obj):
 	return leavetimes
 		
 
-def getNextBusTimes(stop):
-	url = "http://api.translink.ca/RTTIAPI/V1/stops/"+str(stop)+"/estimates?count=3&apiKey=PQuuoaRmkC1jlhtD2JA5"
+def getNextBusTimes(stop, routeno):
+	url = "http://api.translink.ca/RTTIAPI/V1/stops/"+str(stop)+"/estimates?count=3&TimeFrame=1440&RouteNo="+str(routeno)+"&apiKey=PQuuoaRmkC1jlhtD2JA5"
 	header = {'Content-Type' : 'application/JSON'}
 	req = urllib2.Request(url, None, header)
 	data = urllib2.urlopen(req)
@@ -85,7 +93,8 @@ def parsedefinitionxml(data):
 				for dt in definition.findall('dt'):
 					if dt.text:
 						if len(dt.text) > 15:
-							definitionlist.append(dt.text.strip(":"))
+							txt = re.sub("[():{}]", " ", dt.text)
+							definitionlist.append(txt)
 	
 	return definitionlist
 	
@@ -116,12 +125,43 @@ def analyze(i):
 		if (all_words[i] == "####"):
 			os.system("say Watch your language")
 		if (all_words[i] == "99"):
-			leavetimes = getNextBusTimes(59266)
+			leavetimes = getNextBusTimes(59266, 99)
 			os.system("say The 99 leaves at "+str(leavetimes[0])+", "+str(leavetimes[1])+", and "+str(leavetimes[2]))
 		
+		if (all_words[i] == "84"):
+			leavetimes = getNextBusTimes(51917, 84)
+			os.system("say The 84 leaves at "+str(leavetimes[0])+", "+str(leavetimes[1])+", and "+str(leavetimes[2]))
+		
+		if (all_words[i] == "44"):
+			leavetimes = getNextBusTimes(51917, 44)
+			os.system("say The 44 leaves at "+str(leavetimes[0])+", "+str(leavetimes[1])+", and "+str(leavetimes[2]))
+				
 		if (all_words[i] == "weather"):
 			getWeather("UBC", "Canada");
 		
+		if (all_words[i] == "haha"):
+			os.system("say ha ha ha ha")
+		
+		if (all_words[i].lower() in wesbrook):
+			buses = [33, 41, 49, 25, 480]
+			alltimes = []
+			alltimes.append(getNextBusTimes(59272, 33))
+			alltimes.append(getNextBusTimes(59273, 41))
+			alltimes.append(getNextBusTimes(59275, 49))
+			alltimes.append(getNextBusTimes(59271, 25))
+			alltimes.append(getNextBusTimes(59270, 480))
+			
+			bustimes = []
+			for times in alltimes:
+				bustimes.append(time.strptime(times[0], "%I:%M%p"))
+				
+			besttime = time.localtime()
+			for thetime in bustimes:
+				if thetime > besttime:
+					besttime = thetime
+			
+			print buses[bustimes.index(besttime)]
+			
 				
 		if (all_words[i].lower() in current):
 			if (len(all_words) > i+1):
@@ -171,6 +211,35 @@ def analyze(i):
 								temp = weather['temp_min']
 								if temp is not None:
 									os.system("say the low is "+str(temp)+" degrees Celsius")
+					else:
+						i-=1
+						time.sleep(1)
+			else:
+				i-=1
+				time.sleep(1)
+		
+		if (all_words[i].lower() == 'should'):
+			if (len(all_words) > i+1):
+				if (all_words[i+1].lower() == 'i'):
+					if (len(all_words) > i+2):
+						if (all_words[i+2].lower() == 'wear'):
+							weather = getWeather("UBC", "Canada")
+							print weather
+							temp = None
+							if weather is not None:
+								temp = weather['temp']
+							
+							diff = 100
+							win = None
+							if temp is not None:
+								for elem in temps:
+									tdiff = abs(elem - temp)
+									if tdiff < diff:
+										diff = tdiff
+										win = elem
+								saystr = clothing[temps.index(win)]
+								os.system("say you should wear "+saystr)
+								print temp
 					else:
 						i-=1
 						time.sleep(1)
@@ -296,7 +365,7 @@ def analyze(i):
 								if (all_words[i+3] == 'a'):
 									if (len(all_words) > i+4):
 										if (all_words[i+4] == 'joke'):
-											os.system("say Why did jarvis cross the road.  Just kidding.  Fuck you!")
+											os.system("say Why did jarvis cross the road.  Just kidding.")
 									else:
 										i-=1
 										time.sleep(1)
