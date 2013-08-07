@@ -10,6 +10,8 @@ import time
 import datetime
 from xml.etree import ElementTree
 import re
+import jarvis_path
+import gui
 
 all_words = []
 jarvis = ["jarvis", "jervis", "jersey", "germans", "dervis", "thomas", "travis", "garvis" "starbucks", "service", "jars", "charlotte", "chargers", "harris", "purvis", "burgers", "nervous", "tervis", "german", "earth","office", "rs", "things", "ervice", "drivers", "artist" "gorgeous", "first", "davis", "just", "don't", "harvest", "jerk"]
@@ -43,6 +45,8 @@ def parsegooglejson(obj):
 			report.append("%-10s : %s" % (key, jsonresponse[key]))
 	detailed = '\n'.join(report)
 	words = tuple([line.split(':')[1].lstrip() for line in report if line.startswith('utterance')])
+	confidence = tuple([line.split(':')[1].lstrip() for line in report if line.startswith('confidence')])
+	print confidence
 	wordslist = words[0].encode('latin-1').split(' ')
 	all_words.extend(wordslist)
 	print all_words
@@ -117,7 +121,9 @@ def getWeather(city, country=None):
 	data = urllib2.urlopen(req)
 	return parseweatherjson(data)
 	
+	
 def analyze(i):
+	jarvisWaiting = "yes?"
 	while (len(all_words) > i or run):
 		dobj = datetime.datetime.now()
 		while (len(all_words) == i):
@@ -126,7 +132,8 @@ def analyze(i):
 			os.system("say Watch your language")
 		if (all_words[i] == "99"):
 			leavetimes = getNextBusTimes(59266, 99)
-			os.system("say The 99 leaves at "+str(leavetimes[0])+", "+str(leavetimes[1])+", and "+str(leavetimes[2]))
+			thread.start_new_thread(os.system, ("say The 99 leaves at "+str(leavetimes[0])+", "+str(leavetimes[1])+", and "+str(leavetimes[2]),))
+			thread.start_new_thread(gui.sendToBrowser, ("["+str(leavetimes[0])+"], ["+str(leavetimes[1])+"], ["+str(leavetimes[2])+"]",))
 		
 		if (all_words[i] == "84"):
 			leavetimes = getNextBusTimes(51917, 84)
@@ -189,11 +196,12 @@ def analyze(i):
 				if (all_words[i+1] == 'for'):
 					if (len(all_words) > i+2):
 						if (all_words[i+2] == 'today'):
-							weather = getWeather("UBC", "Canada")
+							weather = getWeather("Vancouver", "Canada")
 							if weather is not None:
 								temp = weather['temp_max']
 								if temp is not None:
-									os.system("say the high is "+str(temp)+" degrees Celsius")
+									thread.start_new_thread(os.system, ("say the high is "+str(temp)+" degrees Celsius",))
+									thread.start_new_thread(gui.sendToBrowser, ("the high is "+str(temp)+" degrees Celsius",))
 					else:
 						i-=1
 						time.sleep(1)
@@ -210,7 +218,8 @@ def analyze(i):
 							if weather is not None:
 								temp = weather['temp_min']
 								if temp is not None:
-									os.system("say the low is "+str(temp)+" degrees Celsius")
+									thread.start_new_thread(os.system, ("say the low is "+str(temp)+" degrees Celsius",))
+									thread.start_new_thread(gui.sendToBrowser, ("the low is "+str(temp)+" degrees Celsius",))
 					else:
 						i-=1
 						time.sleep(1)
@@ -310,6 +319,9 @@ def analyze(i):
 		# Fix this, it is a complete gong show.. I mean really -- josh...
 		if (all_words[i].lower() in jarvis):
 			print all_words[i]
+			if jarvisWaiting == "yes?":
+				thread.start_new_thread(gui.sendToBrowser, (jarvisWaiting,))
+				jarvisWaiting = ""
 			if (len(all_words) > i+1):
 				if (all_words[i+1].lower() in stop):
 					os.system('say jarvis is shutting down')
@@ -365,7 +377,8 @@ def analyze(i):
 								if (all_words[i+3] == 'a'):
 									if (len(all_words) > i+4):
 										if (all_words[i+4] == 'joke'):
-											os.system("say Why did jarvis cross the road.  Just kidding.")
+											thread.start_new_thread(os.system, ("say Why did jarvis cross the road.  Just kidding.",))
+											thread.start_new_thread(gui.sendToBrowser, ("Why did jarvis cross the road.  Just kidding.",))
 									else:
 										i-=1
 										time.sleep(1)
@@ -404,7 +417,8 @@ def analyze(i):
 						if (all_words[i+2].lower() == 'is'):
 							if (len(all_words) > i+3):
 								if (all_words[i+3].lower() == 'love'):
-									os.system("say baby dont hurt me, dont hurt me, no more")
+									thread.start_new_thread(os.system, ("say baby dont hurt me, dont hurt me, no more",))
+									thread.start_new_thread(gui.sendToBrowser, ("baby dont hurt me, dont hurt me, no more",))
 							else:		
 								i-=1
 								time.sleep(1)
@@ -421,5 +435,5 @@ def analyze(i):
 
 if __name__ == '__main__':
 	thread.start_new_thread(start, ())
-	getDefinition("happy")
+	thread.start_new_thread(gui.startAllServers, ())
 	analyze(0)
