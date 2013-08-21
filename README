@@ -1,0 +1,16 @@
+==================
+jarvis alpha v0.08
+==================
+
+To run basic application you will need flac installed on your computer.
+
+Other libraries are included to provide access to music and calendar
+
+THIS IS A WORK IN PROGRESS
+
+First alpha release = v0.1
+Current version = v0.08
+
+Current milestone = v0.09
+-Update speech recognition to run client side
+-Change analyze to use datastructures
