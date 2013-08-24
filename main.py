@@ -377,8 +377,8 @@ def analyze(i):
 								if (all_words[i+3] == 'a'):
 									if (len(all_words) > i+4):
 										if (all_words[i+4] == 'joke'):
-											thread.start_new_thread(os.system, ("say Why did jarvis cross the road.  Just kidding, Fuck you.",))
-											thread.start_new_thread(gui.sendToBrowser, ("Why did jarvis cross the road.  Just kidding, Fuck you.",))
+											thread.start_new_thread(os.system, ("say Why did jarvis cross the road.  Just kidding, I'm a Robot",))
+											thread.start_new_thread(gui.sendToBrowser, ("Why did jarvis cross the road.  Just kidding, I'm a Robot",))
 									else:
 										i-=1
 										time.sleep(1)
