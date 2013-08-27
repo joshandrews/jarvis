@@ -23,6 +23,7 @@ current = ["current", "temperature"]
 temperature = ["temperature", "outside"]
 high = ["hi", "high"]
 clothing = ["everything. Just wear everything.", "jeans, with a tuuk, and gloves, and a fleece, and a sweater, and a winter coat, and whatever else you need.  It is super cold out, man", "jeans with a t-shirt and your fleece and a winter coat.  Perhaps the one from John Lewis.  It is rather cold out.", "jeans with a t-shirt and your smartwool or fleece.  It is kind of cold.", "jeans with a t-shirt and your smartwool.  It is balmy out.", "shorts and a t-shirt and your smartwool. It is warm out!", "shorts and a t-shirt.  It is hot out!"]
+blurbber = ["blurbber.com", 'bloomer', 'barber', 'weber', 'labor']
 temps = [-40, -15, -5, 5, 10, 20, 35]
 print len(clothing)
 print len(temps)
@@ -328,6 +329,8 @@ def analyze(i):
 					sys.exit()
 				if (all_words[i+1].lower() in facebook):
 					os.system("/usr/bin/open -a '/Applications/Google Chrome.app' 'http://"+facebook[0]+"'")
+				if (all_words[i+1].lower() in blurbber):
+					os.system("/usr/bin/open -a '/Applications/Google Chrome.app' 'http://"+blurbber[0]+"'")
 				if (all_words[i+1] in dance):
 					os.system('say jarvis is dancing up a storm')
 				if (all_words[i+1] == "status"):
@@ -337,6 +340,8 @@ def analyze(i):
 					if (len(all_words) > i+2):
 						if (all_words[i+2].lower() in facebook):
 							os.system("/usr/bin/open -a '/Applications/Google Chrome.app' 'http://"+facebook[0]+"'")
+						if (all_words[i+2].lower() in blurbber):
+							os.system("/usr/bin/open -a '/Applications/Google Chrome.app' 'http://blurbber.com'")
 					else:
 						i-=1
 						time.sleep(1)
