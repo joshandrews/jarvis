@@ -6,6 +6,9 @@ import struct
 import hashlib
 import base64
 import time
+import urllib2
+import json
+import pygeoip
 
 render = web.template.render('templates/')
 PORT = 8090
@@ -16,9 +19,35 @@ urls = (
 )
 webSocket = None
 
+def parseweatherjson(data):
+	jsonresponse = json.load(data)
+	print jsonresponse
+	weather = jsonresponse['list'][0]
+	return weather
+
+def getIPAddress():
+	ip = json.load(urllib2.urlopen('http://httpbin.org/ip'))['origin']
+	return ip
+
+def getLocation():
+	gi = pygeoip.GeoIP("static/geo/GeoLiteCity.dat", pygeoip.MEMORY_CACHE)
+	return gi.record_by_addr(getIPAddress())
+
+def getWeather(city, country=None):
+	url = "http://api.openweathermap.org/data/2.1/find/name?q="+city+",%20"+country+"&units=metric"
+	header = {'Content-Type' : 'application/json'}
+	req = urllib2.Request(url, None, header)
+	data = urllib2.urlopen(req)
+	return parseweatherjson(data)
+
 class index:
 	def GET(self):
-		return render.index("hello")
+		loc = getLocation()
+		print loc
+		weather = getWeather(loc['city'], loc['country_name'])
+		description = weather['weather'][0]['main']
+		wind = weather['wind']['speed']
+		return render.index("hello", description, wind)
 
 def create_handshake_resp(handshake):
 	final_line = ""

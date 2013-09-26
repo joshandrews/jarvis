@@ -12,6 +12,7 @@ from xml.etree import ElementTree
 import re
 import jarvis_path
 import gui
+import pygeoip
 
 all_words = []
 jarvis = ["jarvis", "jervis", "jersey", "germans", "dervis", "thomas", "travis", "garvis" "starbucks", "service", "jars", "charlotte", "chargers", "harris", "purvis", "burgers", "nervous", "tervis", "german", "earth","office", "rs", "things", "ervice", "drivers", "artist" "gorgeous", "first", "davis", "just", "don't", "harvest", "jerk"]
@@ -114,7 +115,15 @@ def parseweatherjson(data):
 	jsonresponse = json.load(data)
 	weather = jsonresponse['list'][0]['main']
 	return weather
-	
+
+def getIPAddress():
+	ip = json.load(urllib2.urlopen('http://httpbin.org/ip'))['origin']
+	return ip
+
+def getLocation():
+	gi = pygeoip.GeoIP("static/geo/GeoLiteCity.dat", pygeoip.MEMORY_CACHE)
+	return gi.record_by_addr(getIPAddress())
+
 def getWeather(city, country=None):
 	url = "http://api.openweathermap.org/data/2.1/find/name?q="+city+",%20"+country+"&units=metric"
 	header = {'Content-Type' : 'application/json'}
@@ -174,7 +183,8 @@ def analyze(i):
 		if (all_words[i].lower() in current):
 			if (len(all_words) > i+1):
 				if (all_words[i+1].lower() in temperature):
-					weather = getWeather("UBC", "Canada")
+					loc = getLocation()
+					weather = getWeather(loc['city'], loc['country_name'])
 					if weather is not None:
 						temp = weather['temp']
 						if temp is not None:
@@ -197,7 +207,8 @@ def analyze(i):
 				if (all_words[i+1] == 'for'):
 					if (len(all_words) > i+2):
 						if (all_words[i+2] == 'today'):
-							weather = getWeather("Vancouver", "Canada")
+							loc = getLocation()
+							weather = getWeather(loc['city'], loc['country_name'])
 							if weather is not None:
 								temp = weather['temp_max']
 								if temp is not None:

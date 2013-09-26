@@ -15,7 +15,7 @@ $(document).ready(function(){
 		
 		s.onmessage = function (e) {
 			console.log("Socket message:", e.data);
-			$("#jarvis-text").text(e.data);
+			$("#jarvis-text").text(e.data).hide().fadeIn(500);
 		};
 		
 		s.onerror = function (e) {
