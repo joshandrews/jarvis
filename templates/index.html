@@ -4,10 +4,30 @@ $def with (text)
 	<head>
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 		<script src="static/scripts/index.js"></script>
+		<script src="static/scripts/rainyday.js"></script>
 		<link rel="stylesheet" type="text/css" href="static/stylesheets/index.css">
 		<title>Jarvis</title>
+		<script>
+ 			function demo() {
+				var image = document.getElementById('background');
+    			image.onload = function() {
+        			var engine = new RainyDay('canvas','background', window.innerWidth, window.innerHeight);
+
+					engine.gravity = engine.GRAVITY_NON_LINEAR;
+					engine.trail = engine.TRAIL_DROPS;
+					engine.VARIABLE_GRAVITY_ANGLE = Math.PI / 8;
+					engine.rain([ engine.preset(0, 2, 0.5), engine.preset(4, 4, 1) ], 50);
+				};
+    			image.crossOrigin = "anonymous";
+    			image.src="static/images/mountains.jpg";
+    		}
+		</script>
 	</head>
-	<body>
+	<body onload="demo();">
+		<img id="background" src="static/images/mountains.jpg" />
+		<div id="cholder">
+			<canvas id="canvas"></canvas>
+		</div>
 		<div id="jarvis-text">hello world, i'm jarvis</div>
 	</body>
 </html>

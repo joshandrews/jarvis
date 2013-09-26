@@ -2,11 +2,14 @@ body {
 	background-color: #EFEFEF;
 }
 
+img { display: none; }
+#canvas { position: absolute; top: 0px; left: 0px; }
 #jarvis-text {
 	font-family: HelveticaNeue-UltraLight;
 	font-size: 80px;
-	width: 1000px;
-	margin: 0 auto;
-	text-align: center;
-	margin-top: 25%;
+	position: fixed;
+  	top: 50%;
+  	left: 50%;
+  	margin-top: -40px;
+  	margin-left: -300px;
 }
